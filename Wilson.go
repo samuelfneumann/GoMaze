@@ -1,21 +1,33 @@
 package gomaze
 
-import "math/rand"
+import (
+	"fmt"
+	"math/rand"
+)
+
+const InitialPathLength int = 10
 
 type Wilson struct {
 	free []*Cell
 	g    *Grid
 	rng  *rand.Rand
+
+	// To increase efficiency of path initialization
+	// The size of the initialized path slice will be biased towards
+	// this value unless set to 0
+	initialPathLength int
+	timesWalkCalled   float64
 }
 
 func NewWilson(g *Grid, seed int64) Initer {
 	free := make([]*Cell, g.Len())
-	copy(free, g.cells)
+	copy(free, g.Cells())
 
 	return &Wilson{
-		free: free,
-		g:    g,
-		rng:  rand.New(rand.NewSource(seed)),
+		free:              free,
+		g:                 g,
+		rng:               rand.New(rand.NewSource(seed)),
+		initialPathLength: InitialPathLength,
 	}
 }
 
@@ -26,7 +38,15 @@ func (w *Wilson) Init() error {
 
 	for len(w.free) > 0 {
 		// Perform a random walk
-		path := w.walk()
+		path, err := w.walk()
+		if err != nil {
+			return fmt.Errorf("init: could not walk: %v", err)
+		}
+
+		// Update the initial path length with the (biased) estimate of
+		// the average path length
+		w.initialPathLength += int((1 / w.timesWalkCalled) * float64(
+			(len(path) - w.initialPathLength)))
 
 		// Link all cells found in path
 		var prev *Cell
@@ -42,7 +62,9 @@ func (w *Wilson) Init() error {
 	return nil
 }
 
-func (w *Wilson) walk() []*Cell {
+func (w *Wilson) walk() ([]*Cell, error) {
+	w.timesWalkCalled += 1
+
 	// Choose a random starting cell
 	index := w.rng.Intn(len(w.free))
 	cell := w.free[index]
@@ -51,29 +73,15 @@ func (w *Wilson) walk() []*Cell {
 	}
 
 	// Keep track of the path travelled
-	path := make([]*Cell, 0, 10)
+	path := make([]*Cell, 0, w.initialPathLength)
 	path = append(path, cell)
 
 	// Keep find random neighbours until reaching a visited cell
 	freeCell, _ := in(w.free, cell)
 	for freeCell {
-		var neighbourCell *Cell
-
-		for neighbourCell == nil {
-			side := w.rng.Intn(4)
-			switch side {
-			case 0:
-				neighbourCell = cell.north
-
-			case 1:
-				neighbourCell = cell.south
-
-			case 2:
-				neighbourCell = cell.east
-
-			case 3:
-				neighbourCell = cell.west
-			}
+		neighbourCell, err := cell.RandomNeighbour(w.rng)
+		if err != nil {
+			return nil, fmt.Errorf("walk: could not get neighbour %v", err)
 		}
 
 		exists, at := in(path, neighbourCell)
@@ -86,7 +94,8 @@ func (w *Wilson) walk() []*Cell {
 		cell = neighbourCell
 		freeCell, _ = in(w.free, cell)
 	}
-	return path
+
+	return path, nil
 }
 
 func in(slice []*Cell, c *Cell) (bool, int) {

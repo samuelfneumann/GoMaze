@@ -2,6 +2,8 @@
 package gomaze
 
 import (
+	"fmt"
+	"math/rand"
 	"strings"
 )
 
@@ -22,6 +24,45 @@ func NewCell(r, c int) *Cell {
 		col:   c,
 		links: make(map[*Cell]struct{}),
 	}
+}
+
+func (c *Cell) RandomNeighbour(rng *rand.Rand) (*Cell, error) {
+	if c.North() == nil && c.South() == nil && c.East() == nil &&
+		c.West() == nil {
+		return nil, fmt.Errorf("uniformRandomNeighbour: no non-nil " +
+			"neightbour cells")
+	}
+
+	var neighbourCell *Cell
+
+	for neighbourCell == nil {
+		side := rng.Intn(4)
+		switch side {
+		case 0:
+			neighbourCell = c.north
+
+		case 1:
+			neighbourCell = c.south
+
+		case 2:
+			neighbourCell = c.east
+
+		case 3:
+			neighbourCell = c.west
+		}
+	}
+
+	return neighbourCell, nil
+}
+
+func (c *Cell) Neighbours() []*Cell {
+	neighbours := []*Cell{
+		c.North(),
+		c.South(),
+		c.East(),
+		c.West(),
+	}
+	return neighbours
 }
 
 func (c *Cell) CanMoveEast() bool {
