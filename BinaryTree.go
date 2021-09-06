@@ -74,6 +74,6 @@ func bias(direction BiasDirection) (func(c *Cell) *Cell, func(c *Cell) *Cell,
 		return (*Cell).South, (*Cell).East, nil
 
 	default:
-		return nil, nil, fmt.Errorf("bias: no such bias: %v", bias)
+		return nil, nil, fmt.Errorf("bias: no such bias: %v", direction)
 	}
 }
