@@ -44,7 +44,7 @@ func (p *player) MoveEast() {
 }
 
 type Maze struct {
-	grid  *Grid
+	*Grid
 	goal  *Cell
 	start *Cell
 	*player
@@ -87,7 +87,7 @@ func NewMaze(rows, cols int, goalRow, goalCol int,
 	}
 
 	return &Maze{
-		grid:   g,
+		Grid:   g,
 		player: newPlayer(playerStart),
 		goal:   goal,
 		start:  playerStart,
@@ -96,7 +96,7 @@ func NewMaze(rows, cols int, goalRow, goalCol int,
 
 // SetCell sets the current cell of the player
 func (m *Maze) SetCell(col, row int) error {
-	cell, err := m.grid.CellAt(col, row)
+	cell, err := m.CellAt(col, row)
 	if err != nil {
 		return fmt.Errorf("setCell: %v", err)
 	}
@@ -156,16 +156,16 @@ func (m *Maze) String() string {
 	var out strings.Builder
 	out.WriteString("+")
 
-	for c := 0; c < m.grid.Cols(); c++ {
+	for c := 0; c < m.Cols(); c++ {
 		out.WriteString("---+")
 	}
 	out.WriteString("\n")
 
-	for r := 0; r < m.grid.Rows(); r++ {
+	for r := 0; r < m.Rows(); r++ {
 		top := "|"
 		bottom := "+"
-		for c := 0; c < m.grid.Cols(); c++ {
-			cell := m.grid.cells[m.grid.Index(c, r)]
+		for c := 0; c < m.Cols(); c++ {
+			cell := m.cells[m.Index(c, r)]
 
 			var body string
 			if cell == m.player.in {
