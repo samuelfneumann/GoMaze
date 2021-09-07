@@ -106,6 +106,10 @@ func (m *Maze) SetCell(col, row int) error {
 	return nil
 }
 
+func (m *Maze) Start() (int, int) {
+	return m.start.Row(), m.start.Col()
+}
+
 func (m *Maze) Goal() (int, int) {
 	return m.goal.Row(), m.goal.Col()
 }
