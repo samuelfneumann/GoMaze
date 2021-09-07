@@ -93,8 +93,13 @@ func (m *Maze) Step(action int) ([]float64, float64, bool, error) {
 	return obs, reward, done, nil
 }
 
-func (m *Maze) Reset() {
+func (m *Maze) Reset() []float64 {
 	m.player = newPlayer(m.grid.CellAt(0, 0))
+
+	return []float64{
+		float64(m.player.in.Col()),
+		float64(m.player.in.Row()),
+	}
 }
 
 func (m *Maze) String() string {
