@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+const Actions = 4 // Number of actions
+
 type player struct {
 	in *Cell
 }
@@ -56,6 +58,43 @@ func NewMaze(rows, cols int, init Initer) *Maze {
 		player: newPlayer(g.CellAt(0, 0)),
 		goal:   g.CellAt(cols-1, rows-1),
 	}
+}
+
+func (m *Maze) Step(action int) ([]float64, float64, bool, error) {
+	if action < 0 || action > Actions {
+		return nil, 0, false, fmt.Errorf("step: invalid action %v ∉ [%v, %v)",
+			action, 0, Actions)
+	}
+
+	switch action {
+	case 0:
+		m.MoveNorth()
+
+	case 1:
+		m.MoveSouth()
+
+	case 2:
+		m.MoveWest()
+
+	case 3:
+		m.MoveEast()
+	}
+
+	obs := []float64{
+		float64(m.player.in.Col()),
+		float64(m.player.in.Row()),
+	}
+	reward := -1.0
+	done := m.player.in == m.goal
+	if done {
+		reward = 0.0
+	}
+
+	return obs, reward, done, nil
+}
+
+func (m *Maze) Reset() {
+	m.player = newPlayer(m.grid.CellAt(0, 0))
 }
 
 func (m *Maze) String() string {
@@ -111,8 +150,10 @@ func (m *Maze) String() string {
 	return out.String()
 }
 
+// Play runs the maze game in an interactive session
 func (m *Maze) Play() {
 	reader := bufio.NewReader(os.Stdin)
+
 	for m.player.in != m.goal {
 		os.Stdout.WriteString("\x1b[3;J\x1b[H\x1b[2J")
 		fmt.Println(m)
@@ -145,5 +186,7 @@ func (m *Maze) Play() {
 		}
 	}
 
+	os.Stdout.WriteString("\x1b[3;J\x1b[H\x1b[2J")
+	fmt.Println(m)
 	fmt.Println("You won!")
 }
