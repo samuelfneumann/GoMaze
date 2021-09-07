@@ -106,6 +106,10 @@ func (m *Maze) SetCell(col, row int) error {
 	return nil
 }
 
+func (m *Maze) AtGoal() bool {
+	return m.player.in == m.goal
+}
+
 func (m *Maze) Step(action int) ([]float64, float64, bool, error) {
 	if action < 0 || action > Actions {
 		return nil, 0, false, fmt.Errorf("step: invalid action %v ∉ [%v, %v)",
@@ -131,7 +135,7 @@ func (m *Maze) Step(action int) ([]float64, float64, bool, error) {
 		float64(m.player.in.Row()),
 	}
 	reward := -1.0
-	done := m.player.in == m.goal
+	done := m.AtGoal()
 	if done {
 		reward = 0.0
 	}
