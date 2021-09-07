@@ -7,28 +7,26 @@ import (
 
 type AldousBroder struct {
 	visited map[*Cell]struct{}
-	g       *Grid
 	rng     *rand.Rand
 }
 
-func NewAldousBroder(g *Grid, seed int64) Initer {
+func NewAldousBroder(seed int64) Initer {
 	return &AldousBroder{
 		visited: make(map[*Cell]struct{}),
-		g:       g,
 		rng:     rand.New(rand.NewSource(seed)),
 	}
 }
 
-func (a *AldousBroder) Init() error {
+func (a *AldousBroder) Init(g *Grid) error {
 	// Choose a random starting cell
-	r := a.rng.Intn(a.g.Rows())
-	c := a.rng.Intn(a.g.Cols())
-	currentCell := a.g.CellAt(c, r)
+	r := a.rng.Intn(g.Rows())
+	c := a.rng.Intn(g.Cols())
+	currentCell := g.CellAt(c, r)
 
 	a.visited[currentCell] = struct{}{}
 	numVisited := 1
 
-	for numVisited < a.g.Len() {
+	for numVisited < g.Len() {
 		neighbourCell, err := currentCell.RandomNeighbour(a.rng)
 		if err != nil {
 			return fmt.Errorf("init: could not get neighbour: %v", err)

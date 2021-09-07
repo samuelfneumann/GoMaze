@@ -7,30 +7,47 @@ import (
 
 type BinaryTree struct {
 	visited map[*Cell]struct{}
-	g       *Grid
 	rng     *rand.Rand
 	bias    BiasDirection
 }
 
-func NewBinaryTree(g *Grid, seed int64, bias BiasDirection) Initer {
-	return &BinaryTree{
+func NewBinaryTree(seed int64) Initer {
+	init := &BinaryTree{
 		visited: make(map[*Cell]struct{}),
-		g:       g,
 		rng:     rand.New(rand.NewSource(seed)),
-		bias:    bias,
 	}
+
+	// Set a random bias
+	biases := []BiasDirection{NW, NE, SW, SE}
+
+	init.bias = biases[init.rng.Intn(len(biases))]
+	return init
 }
 
-func (b *BinaryTree) Init() error {
+func NewBinaryTreeWithBias(seed int64, bias BiasDirection) (Initer, error) {
+	if bias != NW && bias != NE && bias != SW && bias != SE {
+		return nil, fmt.Errorf("newBinaryTreeWithBias: could not create "+
+			"binary tree with unknown bias %v", bias)
+	}
+
+	return &BinaryTree{
+		visited: make(map[*Cell]struct{}),
+		rng:     rand.New(rand.NewSource(seed)),
+		bias:    bias,
+	}, nil
+
+}
+
+func (b *BinaryTree) Init(g *Grid) error {
 	f1, f2, err := bias(b.bias)
 	if err != nil {
 		return fmt.Errorf("init: could not get bias directions: %v", err)
 	}
 
-	for r := 0; r < b.g.Rows(); r++ {
-		for c := 0; c < b.g.Cols(); c++ {
+	for r := 0; r < g.Rows(); r++ {
+		for c := 0; c < g.Cols(); c++ {
 			neighbours := make([]*Cell, 0, 2)
-			cell := b.g.CellAt(c, r)
+			cell := g.CellAt(c, r)
 
 			if f1(cell) != nil {
 				neighbours = append(neighbours, f1(cell))

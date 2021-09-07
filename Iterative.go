@@ -6,25 +6,23 @@ import (
 
 type Iterative struct {
 	visited map[*Cell]struct{}
-	g       *Grid
 	rng     *rand.Rand
 }
 
-func NewIterative(g *Grid, seed int64) Initer {
+func NewIterative(seed int64) Initer {
 	return &Iterative{
 		visited: make(map[*Cell]struct{}),
-		g:       g,
 		rng:     rand.New(rand.NewSource(seed)),
 	}
 }
 
-func (i *Iterative) Init() error {
+func (i *Iterative) Init(g *Grid) error {
 	stack := make([]*Cell, 0, 100)
 
 	// Choose a random starting cell
-	r := i.rng.Intn(i.g.Rows())
-	c := i.rng.Intn(i.g.Cols())
-	currentCell := i.g.CellAt(c, r)
+	r := i.rng.Intn(g.Rows())
+	c := i.rng.Intn(g.Cols())
+	currentCell := g.CellAt(c, r)
 
 	stack = append(stack, currentCell)
 	i.visited[currentCell] = struct{}{}

@@ -6,25 +6,23 @@ import (
 
 type Backtracking struct {
 	visited map[*Cell]struct{}
-	g       *Grid
 	rng     *rand.Rand
 }
 
-func NewBacktracking(g *Grid, seed int64) Initer {
+func NewBacktracking(seed int64) Initer {
 	return &Backtracking{
 		visited: make(map[*Cell]struct{}),
-		g:       g,
 		rng:     rand.New(rand.NewSource(seed)),
 	}
 }
 
-func (b *Backtracking) Init() error {
+func (b *Backtracking) Init(g *Grid) error {
 	stack := make([]*Cell, 0, 100)
 
 	// Choose a random starting cell
-	r := b.rng.Intn(b.g.Rows())
-	c := b.rng.Intn(b.g.Cols())
-	currentCell := b.g.CellAt(c, r)
+	r := b.rng.Intn(g.Rows())
+	c := b.rng.Intn(g.Cols())
+	currentCell := g.CellAt(c, r)
 
 	stack = append(stack, currentCell)
 	b.visited[currentCell] = struct{}{}

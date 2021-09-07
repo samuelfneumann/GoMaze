@@ -1,13 +1,8 @@
-// https://github.com/gnmathur/aMAZEd
 package gomaze
 
 import (
 	"strings"
 )
-
-type Initer interface {
-	Init() error
-}
 
 type Grid struct {
 	rows, cols int

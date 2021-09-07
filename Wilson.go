@@ -9,7 +9,6 @@ const InitialPathLength int = 10
 
 type Wilson struct {
 	free []*Cell
-	g    *Grid
 	rng  *rand.Rand
 
 	// To increase efficiency of path initialization
@@ -19,21 +18,20 @@ type Wilson struct {
 	timesWalkCalled   float64
 }
 
-func NewWilson(g *Grid, seed int64) Initer {
-	free := make([]*Cell, g.Len())
-	copy(free, g.Cells())
-
+func NewWilson(seed int64) Initer {
 	return &Wilson{
-		free:              free,
-		g:                 g,
+		free:              nil,
 		rng:               rand.New(rand.NewSource(seed)),
 		initialPathLength: InitialPathLength,
 	}
 }
 
-func (w *Wilson) Init() error {
+func (w *Wilson) Init(g *Grid) error {
+	w.free = make([]*Cell, g.Len())
+	copy(w.free, g.Cells())
+
 	// Get the starting position
-	index := w.rng.Intn(w.g.Len())
+	index := w.rng.Intn(g.Len())
 	w.free = append(w.free[:index], w.free[index+1:]...)
 
 	for len(w.free) > 0 {
