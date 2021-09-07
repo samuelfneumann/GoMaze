@@ -1,6 +1,7 @@
 package gomaze
 
 import (
+	"fmt"
 	"math/rand"
 )
 
@@ -22,7 +23,10 @@ func (b *Backtracking) Init(g *Grid) error {
 	// Choose a random starting cell
 	r := b.rng.Intn(g.Rows())
 	c := b.rng.Intn(g.Cols())
-	currentCell := g.CellAt(c, r)
+	currentCell, err := g.CellAt(c, r)
+	if err != nil {
+		return fmt.Errorf("init: could not get first cell: %v", err)
+	}
 
 	stack = append(stack, currentCell)
 	b.visited[currentCell] = struct{}{}

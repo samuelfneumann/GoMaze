@@ -30,7 +30,23 @@ two of the four sides of the maze being spanned by a single corridor.
 ### Backtracking
 
 ```go
-m := gomaze.NewMaze(10, 15, gomaze.NewBackTracking(time.Now().UnixNano()))
+cols, rows := 15, 10
+startCol, startRow := -1, -1
+goalCol, goalRow := -1, -1
+
+m, err := gomaze.NewMaze(
+    rows,
+    cols,
+    goalRow,
+    goalCol,
+    startRow,
+    startCol,
+    gomaze.NewBacktracking(time.Now().UnixNano()),
+)
+if err != nil {
+    log.Fatal(err)
+}
+
 fmt.Println(m)
 
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -59,7 +75,23 @@ fmt.Println(m)
 ### Binary Tree
 
 ```go
-m := gomaze.NewMaze(10, 15, gomaze.NewBinaryTree(time.Now().UnixNano()))
+cols, rows := 15, 10
+startCol, startRow := -1, -1
+goalCol, goalRow := -1, -1
+
+m, err := gomaze.NewMaze(
+    rows,
+    cols,
+    goalRow,
+    goalCol,
+    startRow,
+    startCol,
+    gomaze.NewBinaryTree(time.Now().UnixNano()),
+)
+if err != nil {
+    log.Fatal(err)
+}
+
 fmt.Println(m)
 
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -88,7 +120,23 @@ fmt.Println(m)
 ### Wilson's Algorithm
 
 ```go
-m := gomaze.NewMaze(10, 15, gomaze.NewWilson(time.Now().UnixNano()))
+cols, rows := 15, 10
+startCol, startRow := -1, -1
+goalCol, goalRow := -1, -1
+
+m, err := gomaze.NewMaze(
+    rows,
+    cols,
+    goalRow,
+    goalCol,
+    startRow,
+    startCol,
+    gomaze.NewWilson(time.Now().UnixNano()),
+)
+if err != nil {
+    log.Fatal(err)
+}
+
 fmt.Println(m)
 
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+

@@ -47,7 +47,10 @@ func (b *BinaryTree) Init(g *Grid) error {
 	for r := 0; r < g.Rows(); r++ {
 		for c := 0; c < g.Cols(); c++ {
 			neighbours := make([]*Cell, 0, 2)
-			cell := g.CellAt(c, r)
+			cell, err := g.CellAt(c, r)
+			if err != nil {
+				return fmt.Errorf("init: could not get neighbour: %v", err)
+			}
 
 			if f1(cell) != nil {
 				neighbours = append(neighbours, f1(cell))

@@ -1,6 +1,7 @@
 package gomaze
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -50,8 +51,16 @@ func NewGrid(rows, cols int) *Grid {
 	return g
 }
 
-func (g *Grid) CellAt(x, y int) *Cell {
-	return g.cells[g.Index(x, y)]
+func (g *Grid) CellAt(x, y int) (*Cell, error) {
+	if x > g.Cols() {
+		return nil, fmt.Errorf("cellAt: column index out of range [%v] with "+
+			"length %v", x, g.Cols())
+	}
+	if y > g.Rows() {
+		return nil, fmt.Errorf("cellAt: row index out of range [%v] with "+
+			"length %v", y, g.Rows())
+	}
+	return g.cells[g.Index(x, y)], nil
 }
 
 func (g *Grid) Index(x, y int) int {

@@ -44,20 +44,66 @@ func (p *player) MoveEast() {
 }
 
 type Maze struct {
-	grid *Grid
-	goal *Cell
+	grid  *Grid
+	goal  *Cell
+	start *Cell
 	*player
 }
 
-func NewMaze(rows, cols int, init Initer) *Maze {
+// NewMaze returns a new maze of dimensions rows ⨉ cols. The goal
+// position is at (goalCol, goalRow). If goalCol or goalRow is less
+// than 0, then the bottom right cell is used as the goal. The starting
+// position is at (startCol, startRow). If startCol or startRow is
+// less than 0, thyen the top left cell is used as the starting
+// cell.
+func NewMaze(rows, cols int, goalRow, goalCol int,
+	startRow, startCol int, init Initer) (*Maze, error) {
 	g := NewGrid(rows, cols)
 	init.Init(g)
 
+	// Get the goal cell
+	var goal *Cell
+	var err error
+	if goalRow < 0 || goalCol < 0 {
+		goal, err = g.CellAt(cols-1, rows-1)
+	} else {
+		goal, err = g.CellAt(goalRow, goalCol)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("newMaze: could not get goal position: %v",
+			err)
+	}
+
+	// Get the starting cell
+	var playerStart *Cell
+	if startRow < 0 || startCol < 0 {
+		playerStart, err = g.CellAt(0, 0)
+	} else {
+		playerStart, err = g.CellAt(startRow, startCol)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("newMaze: could not get start position: %v",
+			err)
+	}
+
 	return &Maze{
 		grid:   g,
-		player: newPlayer(g.CellAt(0, 0)),
-		goal:   g.CellAt(cols-1, rows-1),
+		player: newPlayer(playerStart),
+		goal:   goal,
+		start:  playerStart,
+	}, nil
+}
+
+// SetCell sets the current cell of the player
+func (m *Maze) SetCell(col, row int) error {
+	cell, err := m.grid.CellAt(col, row)
+	if err != nil {
+		return fmt.Errorf("setCell: %v", err)
 	}
+
+	m.player.in = cell
+
+	return nil
 }
 
 func (m *Maze) Step(action int) ([]float64, float64, bool, error) {
@@ -94,7 +140,7 @@ func (m *Maze) Step(action int) ([]float64, float64, bool, error) {
 }
 
 func (m *Maze) Reset() []float64 {
-	m.player = newPlayer(m.grid.CellAt(0, 0))
+	m.player = newPlayer(m.start)
 
 	return []float64{
 		float64(m.player.in.Col()),

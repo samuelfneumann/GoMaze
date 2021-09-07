@@ -21,7 +21,10 @@ func (a *AldousBroder) Init(g *Grid) error {
 	// Choose a random starting cell
 	r := a.rng.Intn(g.Rows())
 	c := a.rng.Intn(g.Cols())
-	currentCell := g.CellAt(c, r)
+	currentCell, err := g.CellAt(c, r)
+	if err != nil {
+		return fmt.Errorf("init: could not get first cell: %v", err)
+	}
 
 	a.visited[currentCell] = struct{}{}
 	numVisited := 1
