@@ -106,6 +106,10 @@ func (m *Maze) SetCell(col, row int) error {
 	return nil
 }
 
+func (m *Maze) Goal() (int, int) {
+	return m.goal.Row(), m.goal.Col()
+}
+
 func (m *Maze) AtGoal() bool {
 	return m.player.in == m.goal
 }
