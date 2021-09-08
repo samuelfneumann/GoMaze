@@ -20,6 +20,7 @@ func main() {
 		startRow,
 		startCol,
 		gomaze.NewWilson(time.Now().UnixNano()),
+		false,
 	)
 	if err != nil {
 		log.Fatal(err)

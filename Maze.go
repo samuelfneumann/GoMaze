@@ -48,6 +48,8 @@ type Maze struct {
 	goal  *Cell
 	start *Cell
 	*player
+
+	oneHotState bool
 }
 
 // NewMaze returns a new maze of dimensions rows ⨉ cols. The goal
@@ -55,9 +57,10 @@ type Maze struct {
 // than 0, then the bottom right cell is used as the goal. The starting
 // position is at (startCol, startRow). If startCol or startRow is
 // less than 0, thyen the top left cell is used as the starting
-// cell.
-func NewMaze(rows, cols int, goalRow, goalCol int,
-	startRow, startCol int, init Initer) (*Maze, error) {
+// cell. The oneHotState parameter determines if state observations
+// returned by Step() and Reset() should be one-hot or (x, y) positions.
+func NewMaze(rows, cols int, goalRow, goalCol int, startRow, startCol int,
+	init Initer, oneHotState bool) (*Maze, error) {
 	g := NewGrid(rows, cols)
 	init.Init(g)
 
@@ -87,10 +90,11 @@ func NewMaze(rows, cols int, goalRow, goalCol int,
 	}
 
 	return &Maze{
-		Grid:   g,
-		player: newPlayer(playerStart),
-		goal:   goal,
-		start:  playerStart,
+		Grid:        g,
+		player:      newPlayer(playerStart),
+		goal:        goal,
+		start:       playerStart,
+		oneHotState: oneHotState,
 	}, nil
 }
 
@@ -138,26 +142,19 @@ func (m *Maze) Step(action int) ([]float64, float64, bool, error) {
 		m.MoveEast()
 	}
 
-	obs := []float64{
-		float64(m.player.in.Col()),
-		float64(m.player.in.Row()),
-	}
 	reward := -1.0
 	done := m.AtGoal()
 	if done {
 		reward = 0.0
 	}
 
-	return obs, reward, done, nil
+	return m.obs(), reward, done, nil
 }
 
 func (m *Maze) Reset() []float64 {
 	m.player = newPlayer(m.start)
 
-	return []float64{
-		float64(m.player.in.Col()),
-		float64(m.player.in.Row()),
-	}
+	return m.obs()
 }
 
 func (m *Maze) String() string {
@@ -213,6 +210,18 @@ func (m *Maze) String() string {
 	return out.String()
 }
 
+// OneHot returns a one-hot vector representing the position of the
+// player in the maze
+func (m *Maze) OneHot() []float64 {
+	onehot := make([]float64, m.Len())
+
+	row := m.player.in.Row()
+	col := m.player.in.Col()
+	onehot[m.Index(col, row)] = 1.0
+
+	return onehot
+}
+
 // Play runs the maze game in an interactive session
 func (m *Maze) Play() {
 	reader := bufio.NewReader(os.Stdin)
@@ -252,4 +261,16 @@ func (m *Maze) Play() {
 	os.Stdout.WriteString("\x1b[3;J\x1b[H\x1b[2J")
 	fmt.Println(m)
 	fmt.Println("You won!")
+}
+
+// obs returns the current state observation
+func (m *Maze) obs() []float64 {
+	if m.oneHotState {
+		return m.OneHot()
+	}
+
+	return []float64{
+		float64(m.player.in.Col()),
+		float64(m.player.in.Row()),
+	}
 }
