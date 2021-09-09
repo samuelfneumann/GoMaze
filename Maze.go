@@ -148,13 +148,13 @@ func (m *Maze) Step(action int) ([]float64, float64, bool, error) {
 		reward = 0.0
 	}
 
-	return m.obs(), reward, done, nil
+	return m.Obs(), reward, done, nil
 }
 
 func (m *Maze) Reset() []float64 {
 	m.player = newPlayer(m.start)
 
-	return m.obs()
+	return m.Obs()
 }
 
 func (m *Maze) String() string {
@@ -263,8 +263,8 @@ func (m *Maze) Play() {
 	fmt.Println("You won!")
 }
 
-// obs returns the current state observation
-func (m *Maze) obs() []float64 {
+// Obs returns the current state observation
+func (m *Maze) Obs() []float64 {
 	if m.oneHotState {
 		return m.OneHot()
 	}
