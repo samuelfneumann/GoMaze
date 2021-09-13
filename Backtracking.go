@@ -5,11 +5,14 @@ import (
 	"math/rand"
 )
 
+// Backtracking initializes a maze from a grid using the recursive
+// backtracking algorithm
 type Backtracking struct {
 	visited map[*Cell]struct{}
 	rng     *rand.Rand
 }
 
+// NewBackTracking returns a new Backtracking
 func NewBacktracking(seed int64) Initer {
 	return &Backtracking{
 		visited: make(map[*Cell]struct{}),
@@ -17,6 +20,8 @@ func NewBacktracking(seed int64) Initer {
 	}
 }
 
+// Init initializes a maze from a grid using the recursive backtracking
+// algorithm
 func (b *Backtracking) Init(g *Grid) error {
 	stack := make([]*Cell, 0, 100)
 

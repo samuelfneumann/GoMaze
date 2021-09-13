@@ -5,10 +5,16 @@ import (
 	"math/rand"
 )
 
-const InitialPathLength int = 10
+// initialPathLength is used to increase the efficiency of allocating
+// a slice representing a path. It tracks the average path length up
+// until the current iteration (biased toward whatever value it is
+// initialize with). Then, the path of the current iteration is stored
+// in a slice that has been initialized with initialPathLength elements.
+const initialPathLength int = 10
 
+// Wilson initiailzes a maze from a grid using Wilson's algorithm
 type Wilson struct {
-	free []*Cell
+	free []*Cell // Free cells not yet in the maze
 	rng  *rand.Rand
 
 	// To increase efficiency of path initialization
@@ -18,14 +24,16 @@ type Wilson struct {
 	timesWalkCalled   float64
 }
 
+// NewWilson returns a new Wilson
 func NewWilson(seed int64) Initer {
 	return &Wilson{
 		free:              nil,
 		rng:               rand.New(rand.NewSource(seed)),
-		initialPathLength: InitialPathLength,
+		initialPathLength: initialPathLength,
 	}
 }
 
+// Init initializes a maze from a grid using Wilson's algorithm
 func (w *Wilson) Init(g *Grid) error {
 	w.free = make([]*Cell, g.Len())
 	copy(w.free, g.Cells())
@@ -60,6 +68,8 @@ func (w *Wilson) Init(g *Grid) error {
 	return nil
 }
 
+// walk performs a random walk over the cells of the grid, ignoring
+// all cell walls.
 func (w *Wilson) walk() ([]*Cell, error) {
 	w.timesWalkCalled += 1
 
@@ -96,6 +106,7 @@ func (w *Wilson) walk() ([]*Cell, error) {
 	return path, nil
 }
 
+// in returns if c is in slice
 func in(slice []*Cell, c *Cell) (bool, int) {
 	for i, cell := range slice {
 		if cell == c {

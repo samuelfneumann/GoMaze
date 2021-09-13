@@ -5,12 +5,15 @@ import (
 	"math/rand"
 )
 
+// BinaryTree initializes a grid into a maze using the binary tree
+// algorithm.
 type BinaryTree struct {
 	visited map[*Cell]struct{}
 	rng     *rand.Rand
 	bias    BiasDirection
 }
 
+// NewBinaryTree returns a new BinaryTree
 func NewBinaryTree(seed int64) Initer {
 	init := &BinaryTree{
 		visited: make(map[*Cell]struct{}),
@@ -24,6 +27,8 @@ func NewBinaryTree(seed int64) Initer {
 	return init
 }
 
+// NewBinaryTreeWithBias returns a new BinaryTree with bias given by
+// bias
 func NewBinaryTreeWithBias(seed int64, bias BiasDirection) (Initer, error) {
 	if bias != NW && bias != NE && bias != SW && bias != SE {
 		return nil, fmt.Errorf("newBinaryTreeWithBias: could not create "+
@@ -38,6 +43,7 @@ func NewBinaryTreeWithBias(seed int64, bias BiasDirection) (Initer, error) {
 
 }
 
+// Init initializes a grid using the binary tree algorithm
 func (b *BinaryTree) Init(g *Grid) error {
 	f1, f2, err := bias(b.bias)
 	if err != nil {

@@ -5,11 +5,14 @@ import (
 	"math/rand"
 )
 
+// Iterative initializes a grid into a maze using the iterative
+// maze generation algorithm
 type Iterative struct {
 	visited map[*Cell]struct{}
 	rng     *rand.Rand
 }
 
+// NewIterative returns a new Iterative
 func NewIterative(seed int64) Initer {
 	return &Iterative{
 		visited: make(map[*Cell]struct{}),
@@ -17,6 +20,7 @@ func NewIterative(seed int64) Initer {
 	}
 }
 
+// Init initializes a grid into a maze using the iterative algorithm
 func (i *Iterative) Init(g *Grid) error {
 	stack := make([]*Cell, 0, 100)
 

@@ -1,3 +1,5 @@
+// Package gomaze implements functionality for generating random,
+// solvable mazes in Go for reinforcement learning.
 package gomaze
 
 import (
@@ -9,46 +11,57 @@ import (
 
 const Actions = 4 // Number of actions
 
+// player implements the functionality of a player in a maze
 type player struct {
+	// in the the cell of the maze that the player is in
 	in *Cell
 }
 
+// newPlayer creates a new player in the specified cell
 func newPlayer(start *Cell) *player {
 	return &player{
 		in: start,
 	}
 }
 
+// MoveSouth moves the player south if possible
 func (p *player) MoveSouth() {
 	if p.in.CanMoveSouth() {
 		p.in = p.in.South()
 	}
 }
 
+// MoveNorth moves the player north if possible
 func (p *player) MoveNorth() {
 	if p.in.CanMoveNorth() {
 		p.in = p.in.North()
 	}
 }
 
+// MoveWest moves the player west if possible
 func (p *player) MoveWest() {
 	if p.in.CanMoveWest() {
 		p.in = p.in.West()
 	}
 }
 
+// MoveEast moves the player east if possible
 func (p *player) MoveEast() {
 	if p.in.CanMoveEast() {
 		p.in = p.in.East()
 	}
 }
 
+// Maze implements a maze.
 type Maze struct {
-	*Grid
+	*Grid // The grid of cells
 	goal  *Cell
 	start *Cell
 	*player
 
+	// oneHotState determines whether the maze's state observations
+	// should be (x, y)-like or one-hot encodings of the (x, y)
+	// coordinates of the player in the maze.
 	oneHotState bool
 }
 
@@ -110,18 +123,24 @@ func (m *Maze) SetCell(col, row int) error {
 	return nil
 }
 
+// Start returns the row and column of the starting state
 func (m *Maze) Start() (int, int) {
 	return m.start.Row(), m.start.Col()
 }
 
+// Goal returns the row and column of the goal state
 func (m *Maze) Goal() (int, int) {
 	return m.goal.Row(), m.goal.Col()
 }
 
+// AtGoal returns whether the player in the maze is at the goal
 func (m *Maze) AtGoal() bool {
 	return m.player.in == m.goal
 }
 
+// Step takes a single environmental step given some action to take
+// in the maze. This function returns the state observation, the
+// reward, and whether or not the action led to an absorbing state.
 func (m *Maze) Step(action int) ([]float64, float64, bool, error) {
 	if action < 0 || action > Actions {
 		return nil, 0, false, fmt.Errorf("step: invalid action %v ∉ [%v, %v)",
@@ -151,12 +170,14 @@ func (m *Maze) Step(action int) ([]float64, float64, bool, error) {
 	return m.Obs(), reward, done, nil
 }
 
+// Reset resets the environment to some starting state
 func (m *Maze) Reset() []float64 {
 	m.player = newPlayer(m.start)
 
 	return m.Obs()
 }
 
+// String returns the string representation of the maze
 func (m *Maze) String() string {
 	var out strings.Builder
 	out.WriteString("+")

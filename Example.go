@@ -1,25 +1,23 @@
-package main
+package gomaze
 
 import (
 	"log"
 	"time"
-
-	"github.com/samuelfneumann/gomaze"
 )
 
-func main() {
+func Example() {
 	cols, rows := 15, 10
 	startCol, startRow := -1, -1
 	goalCol, goalRow := -1, -1
 
-	m, err := gomaze.NewMaze(
+	m, err := NewMaze(
 		rows,
 		cols,
 		goalRow,
 		goalCol,
 		startRow,
 		startCol,
-		gomaze.NewWilson(time.Now().UnixNano()),
+		NewWilson(time.Now().UnixNano()),
 		false,
 	)
 	if err != nil {

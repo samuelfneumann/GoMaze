@@ -5,11 +5,14 @@ import (
 	"strings"
 )
 
+// Grid implements a grid of cells
 type Grid struct {
 	rows, cols int
 	cells      []*Cell
 }
 
+// NewGrid returns a new grid of cells. Each cell has all four walls
+// set, so that once in a cell, you cannot move out of the cell.
 func NewGrid(rows, cols int) *Grid {
 	cells := make([]*Cell, rows*cols)
 
@@ -51,6 +54,7 @@ func NewGrid(rows, cols int) *Grid {
 	return g
 }
 
+// CellAt returns the cell at column x and row y in the grid
 func (g *Grid) CellAt(x, y int) (*Cell, error) {
 	if x > g.Cols() {
 		return nil, fmt.Errorf("cellAt: column index out of range [%v] with "+
@@ -63,26 +67,36 @@ func (g *Grid) CellAt(x, y int) (*Cell, error) {
 	return g.cells[g.Index(x, y)], nil
 }
 
+// Index converts an x, y index into the grid into a single-dimensional
+// index. If the grid were flattened to be 1-dimensional, the value
+// g.Index(x, y) would be the index to cell with column x and row y in
+// the grid
 func (g *Grid) Index(x, y int) int {
 	return y*g.cols + x
 }
 
+// Len returns the number of cell in the grid
 func (g *Grid) Len() int {
 	return g.rows * g.cols
 }
 
+// Rows returns the number of row in the grid
 func (g *Grid) Rows() int {
 	return g.rows
 }
 
+// Cols returns the number of columns in the grid
 func (g *Grid) Cols() int {
 	return g.cols
 }
 
+// Cells returns the cells of the grid in a 1-dimensional slice and in
+// row-major format.
 func (g *Grid) Cells() []*Cell {
 	return g.cells
 }
 
+// String returns a string representation of the grid
 func (g *Grid) String() string {
 	var out strings.Builder
 	out.WriteString("+")

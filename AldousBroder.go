@@ -5,11 +5,14 @@ import (
 	"math/rand"
 )
 
+// AldousBroder initializes a grid into a maze with the Aldous-Broder
+// algorithm.
 type AldousBroder struct {
 	visited map[*Cell]struct{}
 	rng     *rand.Rand
 }
 
+// NewAldousBroder returns a new AldousBroder
 func NewAldousBroder(seed int64) Initer {
 	return &AldousBroder{
 		visited: make(map[*Cell]struct{}),
@@ -17,6 +20,7 @@ func NewAldousBroder(seed int64) Initer {
 	}
 }
 
+// Init initialzies a grid into a maze using the AldousBroder algorithm.
 func (a *AldousBroder) Init(g *Grid) error {
 	// Choose a random starting cell
 	r := a.rng.Intn(g.Rows())
